@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Copyright (C) 2013 NEC de Colombia/TX-NOC
+# Author: Carlos Uribe <cauribe@nec.com.co>
+
+IP_ADDRESS=$1
+BASE_PATH="/auto"
+
+PING_TIMEOUT=1
+SAMPLE_SIZE=30
+MAX_PACKET_SIZE=65535
+
+echo "============== NEC Throughput Calculator =============="
+echo "Start: `date`"
+echo -e "\nComputing max packet size allowed by channel..."
+
+lower_limit=1
+upper_limit=$MAX_PACKET_SIZE
+result_size=`echo "($upper_limit + $lower_limit) / 2" | bc`
+
+while [[ "$result_size" != "$upper_limit" && "$result_size" != "$lower_limit" ]]
+do
+	probe=`python $BASE_PATH/lveping.py $IP_ADDRESS $PING_TIMEOUT $result_size`
+	echo -en "\r> $result_size bytes  "
+
+	if [ "$probe" != "None" ]; then
+		lower_limit=$result_size
+	else
+		upper_limit=$result_size
+	fi
+
+	result_size=`echo "($upper_limit + $lower_limit) / 2" | bc`
+done
+
+echo -e "\nGetting samples to calculate average..."
+
+idx=0
+average=0
+
+while [ $idx -lt $SAMPLE_SIZE ]
+do
+	item=`python $BASE_PATH/lveping.py $IP_ADDRESS $PING_TIMEOUT $result_size`
+	echo -en "\r> $item ms  "
+
+	if [ "$item" != "None" ]
+	then
+		average=`echo "$average + $item" | bc`
+		(( idx++ ))
+	fi
+done
+
+average=`echo "$average / $SAMPLE_SIZE" | bc -l`
+throughput=`echo "$result_size * 8 * 1000 / ($average * 1024)" | bc -l`
+
+echo -e "\n\nTarget:\t\t$IP_ADDRESS"
+echo -e "Max size:\t$result_size byte"
+printf "Av RTT:\t\t%0.2f ms\n" $average
+printf "Throughput:\t%g Kbps\n" $throughput
