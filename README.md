@@ -11,7 +11,7 @@ After cloning or copying the project, run `install` on a Unix shell from anywher
 
 Configuring
 -----------
-Edit `nectp` using your favorite text editor and change lines below as your convenience. Default values are tested to work under nominal conditions:
+Edit `nectp` in your favorite editor and change lines below as your convenience. Default values was tested to work under nominal conditions.
 
 ```bash
 PING_TIMEOUT=1
