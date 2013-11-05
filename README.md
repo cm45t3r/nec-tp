@@ -9,7 +9,7 @@ Installing
 ----------
 After cloning or copying the project, run `install` on a Unix shell from anywhere with root privileges.
 
-COnfiguring
+Configuring
 -----------
 Edit `nec-tp` using your favorite text editor and change lines below as your convenience. Default values are tested to work under nominal conditions:
 
