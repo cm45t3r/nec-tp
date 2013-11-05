@@ -1,7 +1,7 @@
 NEC Throughput
 ==============
 
-Pre-requisites
+Prerequisites
 -------------
 In order to run nec-tp smoothly, you must install [rawping](https://github.com/cm45t3r/rawping) first.
 
@@ -11,7 +11,7 @@ After cloning or copying the project, run `install` on a Unix shell from anywher
 
 Configuring
 -----------
-Edit `nec-tp` using your favorite text editor and change lines below as your convenience. Default values are tested to work under nominal conditions:
+Edit `nectp` using your favorite text editor and change lines below as your convenience. Default values are tested to work under nominal conditions:
 
 ```bash
 PING_TIMEOUT=1
