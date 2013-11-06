@@ -1,26 +1,42 @@
 #!/bin/bash
 
-# Copyright (C) 2013 NEC de Colombia/TX-NOC
+#   Copyright (C) 2013 NEC de Colombia/NOC-Tx
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# NEC Throughput
 # Author: Carlos Uribe <cauribe@nec.com.co>
 
-IP_ADDRESS=$1
-BASE_PATH="/auto"
-
+# Configuration
 PING_TIMEOUT=1
 SAMPLE_SIZE=30
 MAX_PACKET_SIZE=65535
 
-echo "============== NEC Throughput Calculator =============="
-echo "Start: `date`"
-echo -e "\nComputing max packet size allowed by channel..."
-
+# Globals
+IP_ADDRESS=$1
+PING_COUNT=1
 lower_limit=1
 upper_limit=$MAX_PACKET_SIZE
 result_size=`echo "($upper_limit + $lower_limit) / 2" | bc`
 
+# Start
+echo "============== NEC Throughput Calculator =============="
+echo "Start: `date`"
+echo -e "\nComputing max packet size allowed by channel..."
+
 while [[ "$result_size" != "$upper_limit" && "$result_size" != "$lower_limit" ]]
 do
-	probe=`python $BASE_PATH/lveping.py $IP_ADDRESS $PING_TIMEOUT $result_size`
+	probe=`rawping $IP_ADDRESS $PING_COUNT $PING_TIMEOUT $result_size`
 	echo -en "\r> $result_size bytes  "
 
 	if [ "$probe" != "None" ]; then
@@ -34,12 +50,13 @@ done
 
 echo -e "\nGetting samples to calculate average..."
 
+# Compute average
 idx=0
 average=0
 
 while [ $idx -lt $SAMPLE_SIZE ]
 do
-	item=`python $BASE_PATH/lveping.py $IP_ADDRESS $PING_TIMEOUT $result_size`
+	item=`rawping $IP_ADDRESS $PING_COUNT $PING_TIMEOUT $result_size`
 	echo -en "\r> $item ms  "
 
 	if [ "$item" != "None" ]
