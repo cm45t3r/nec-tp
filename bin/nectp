@@ -57,11 +57,11 @@ average=0
 while [ $idx -lt $SAMPLE_SIZE ]
 do
 	item=`rawping $IP_ADDRESS $PING_COUNT $PING_TIMEOUT $result_size`
-	echo -en "\r> $item ms  "
+	echo -en "\r> $item  "
 
 	if [ "$item" != "None" ]
 	then
-		average=`echo "$average + $item" | bc`
+		average=`echo "$average + $item" | sed "s/ms//g" | bc`
 		(( idx++ ))
 	fi
 done
