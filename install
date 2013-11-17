@@ -20,7 +20,7 @@
 # Checking prerequisites
 if [ `id -u` -eq 0 ]
 then
-	echo "====== Installing NEC Throughput ======"
+  echo "====== Installing NEC Throughput ======"
   echo "Copying files ..."
   cp bin/nectp /usr/bin
   
