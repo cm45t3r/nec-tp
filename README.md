@@ -2,11 +2,11 @@ NEC Throughput
 ==============
 Measures instant channel throughput by finding maximum packet size and computing sample average of raw ICMP requests of that size.
 
-It uses a binary search algorithm to find maximum packet size, so it won't take more than a couple of minutes to finish.
+It uses a binary search algorithm to find maximum packet size, so it won't take more than a minute to finish for the worst case and seconds for the best case.
 
 Prerequisites
 -------------
-In order to run nec-tp smoothly, you must install [rawping](https://github.com/cm45t3r/rawping) first in your system. You must have root privileges to install and run.
+In order to run <b>nectp</b> smoothly, you must install [rawping](https://github.com/cm45t3r/rawping) first in your system. You must have root privileges to install and run.
 
 Installing
 ----------
