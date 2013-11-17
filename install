@@ -1,5 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
+#   NEC Throughput Installer
+#
+#   Author: Carlos Uribe <cauribe@nec.com.co>
 #   Copyright (C) 2013 NEC de Colombia/NOC-Tx
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,22 +17,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# NEC Throughput Installer
-# Author: Carlos Uribe <cauribe@nec.com.co>
-
-echo "====== NEC Throughput ======"
-
 # Checking prerequisites
 if [ `id -u` -eq 0 ]
 then
+	echo "====== Installing NEC Throughput ======"
   echo "Copying files ..."
   cp bin/nectp /usr/bin
   
   echo "Granting permissions ..."
   chmod ugo+x /usr/bin/nectp
   
-  echo "Done."
+  echo "Done!"
 else
-  echo "You must have root privileges to install."
+  echo "You must have root privileges to install nectp."
   echo "Try 'sudo ./install' instead."
 fi

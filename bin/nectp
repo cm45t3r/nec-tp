@@ -1,5 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
+#	NEC Throughput
+#   Measures instant channel throughput on a tcp network.
+#
+#   Author: Carlos Uribe <cauribe@nec.com.co>
 #   Copyright (C) 2013 NEC de Colombia/NOC-Tx
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,30 +18,42 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# NEC Throughput
-# Author: Carlos Uribe <cauribe@nec.com.co>
-
 # Configuration
+PING_COUNT=1
 PING_TIMEOUT=1
 SAMPLE_SIZE=30
-MAX_PACKET_SIZE=65535
+MAX_PACKET_SIZE=65500
 
 # Globals
-IP_ADDRESS=$1
-PING_COUNT=1
+HOST=$1
 lower_limit=1
 upper_limit=$MAX_PACKET_SIZE
 result_size=`echo "($upper_limit + $lower_limit) / 2" | bc`
 
+# Check root access
+if [ `id -u` -ne 0 ]
+then
+	echo "You must have root privileges to run nectp."
+	exit 1
+fi
+
 # Start
 echo "============== NEC Throughput Calculator =============="
 echo "Start: `date`"
+
+# Check connectivity
+if ! [[ `rawping $HOST 1 1 1 | sed "s/ms//g" | tr -d " "` =~ ^[0-9]+([\.][0-9]+)?$ ]]
+then
+	echo -e "\nTarget: $HOST is down."
+	exit 1
+fi
+
 echo -e "\nComputing max packet size allowed by channel..."
 
 while [[ "$result_size" != "$upper_limit" && "$result_size" != "$lower_limit" ]]
 do
-	probe=`rawping $IP_ADDRESS $PING_COUNT $PING_TIMEOUT $result_size`
-	echo -en "\r> $result_size bytes  "
+	probe=`rawping $HOST $PING_COUNT $PING_TIMEOUT $result_size`
+	echo -en "\r> $result_size bytes\t\t"
 
 	if [ "$probe" != "None" ]; then
 		lower_limit=$result_size
@@ -48,16 +64,17 @@ do
 	result_size=`echo "($upper_limit + $lower_limit) / 2" | bc`
 done
 
-echo -e "\nGetting samples to calculate average..."
-
 # Compute average
 idx=0
 average=0
+PACKET_SIZE=`echo $result_size | sed "s/ms//g" | bc`
+
+echo -e "\nGetting samples ($SAMPLE_SIZE) to calculate average..."
 
 while [ $idx -lt $SAMPLE_SIZE ]
 do
-	item=`rawping $IP_ADDRESS $PING_COUNT $PING_TIMEOUT $result_size`
-	echo -en "\r> $item  "
+	item=`rawping $HOST $PING_COUNT $PING_TIMEOUT $PACKET_SIZE`
+	echo -en "\r> $item\t\t"
 
 	if [ "$item" != "None" ]
 	then
@@ -69,7 +86,9 @@ done
 average=`echo "$average / $SAMPLE_SIZE" | bc -l`
 throughput=`echo "$result_size * 8 * 1000 / ($average * 1024)" | bc -l`
 
-echo -e "\n\nTarget:\t\t$IP_ADDRESS"
+echo -e "\n\nTarget:\t\t$HOST"
 echo -e "Max size:\t$result_size byte"
 printf "Av RTT:\t\t%0.2f ms\n" $average
-printf "Throughput:\t%g Kbps\n" $throughput
+printf "Throughput:\t%g Kbps\n\n" $throughput
+
+echo "Finished: `date`"
