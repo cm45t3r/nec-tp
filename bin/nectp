@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-#	NEC Throughput
+#   NEC Throughput
 #   Measures instant channel throughput on a tcp network.
 #
 #   Author: Carlos Uribe <cauribe@nec.com.co>
-#   Copyright (C) 2013 NEC de Colombia/NOC-Tx
+#   NEC de Colombia/NOC-Tx (2013)
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
